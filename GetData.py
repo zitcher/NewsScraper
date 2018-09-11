@@ -78,7 +78,7 @@ class Gaurdian(object):
 
 
 class Alphavantage(object):
-    def __init__(self, api_key="AJCT3CZ76578T8G3", search_endpoint="https://www.alphavantage.co/query"):
+    def __init__(self, api_key="", search_endpoint="https://www.alphavantage.co/query"):
         self.api_key = api_key
         self.search_endpoint = search_endpoint
 
