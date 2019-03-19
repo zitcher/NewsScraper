@@ -16,6 +16,9 @@ class Gaurdian(object):
     string q: the query
     string from_date: year-month-day
     string to_date: year-month-day
+    
+    out:
+    Response from api get request. Doc found on Gaurdian dev website.
     '''
     def guardian_get(self,
                      q,
@@ -53,30 +56,7 @@ class Gaurdian(object):
         # request
         return get(url, jsondata).json()
 
-    '''
-    input
-    date: %Y-%m-%d
-
-    output:
-    [(article_url, article_date) ....]
-    '''
-    def get_day_web_links_times(self, date):
-        responses = []
-        intial_get = self.guardian_get(None, date, date, 1)
-        responses.append(intial_get)
-        num_pages = intial_get["response"]["pages"]
-
-        for i in range(2, num_pages+1):
-            responses.append(self.guardian_get(None, date, date, i))
-
-        article_urls_dates = []
-        for page in responses:
-            for article in page["response"]["results"]:
-                article_urls_dates.append((article["webUrl"], article["webPublicationDate"]))
-
-        return article_urls_dates
-
-
+    
 class Alphavantage(object):
     def __init__(self, api_key="", search_endpoint="https://www.alphavantage.co/query"):
         self.api_key = api_key
@@ -101,24 +81,24 @@ class Alphavantage(object):
             "datatype": datatype,
             "outputsize": outputsize
         }
-        print(jsondata)
         ret = get(url, jsondata).json()
-        print(ret)
         return ret
 
     '''
     input: alpha_vantage_get data
     output: list of tuples:
-    (
-        'yr-month-day',
-        {
-        '1. open': 'val',
-        '2. high': 'val',
-        '3. low' : 'val',
-        '4. close' : 'val',
-        '5. volume' : 'val';'
-        }
-    )
+    [
+        (
+            'yr-month-day',
+            {
+            '1. open': 'val',
+            '2. high': 'val',
+            '3. low' : 'val',
+            '4. close' : 'val',
+            '5. volume' : 'val';'
+            }
+        ), ....
+    ]
     '''
     def stock_data_to_list(self, stock_data):
         stock_dic = stock_data['Time Series (Daily)']
@@ -135,7 +115,7 @@ class Alphavantage(object):
         float low,
         float close,
         float volume
-        ]
+        ], .....
     ]
     '''
     def parse_stock_list(self, stock_data):
@@ -159,22 +139,12 @@ class Alphavantage(object):
      float low,
      float close,
      float volume
-     ]
+     ], ...
     ]
     '''
     def full_parse(self, stock_data):
         return self.parse_stock_list(self.stock_data_to_list(stock_data))
-
-
-def percent_change(a, b):
-    if (a + b == 0):
-        return 0
-    return (b - a)/midpoint(a, b)
-
-
-def midpoint(a, b):
-    return (a + b)/2
-
+  
 
 class NYT(object):
     def __init__(self,
@@ -186,6 +156,9 @@ class NYT(object):
     '''
     int year: > 1990
     int month: 1-12
+    
+    out:
+    Response from api get request. Doc found on NYT dev website.
     '''
     def archive_get(self,
                     year,
@@ -201,21 +174,3 @@ class NYT(object):
         }
         # request
         return get(self.archive_endpoint+str(year)+"/"+str(month)+".json", jsondata).json()
-
-    '''
-    input
-    integer year: 2001
-    integer month: 7
-
-    output:
-    [(article_url, article_date) ....]
-    '''
-    def get_month_links_date(self, year, month):
-        article_urls_dates = []
-        response = self.archive_get(year, month)
-
-        article_urls_dates = []
-        for doc in response['response']['docs']:
-            article_urls_dates.append((doc["web_url"], doc['pub_date']))
-
-        return article_urls_dates
