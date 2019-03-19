@@ -33,7 +33,7 @@ class Gaurdian(object):
 
         # create jsondata
         jsondata = {}
-        if q is None or q == "":
+        if q is not None and q != "":
             jsondata = {
                 "api-key": api_key,
                 "q": q,
